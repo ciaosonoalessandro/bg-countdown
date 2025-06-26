@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Conto alla Rovescia Speciale</title>
+    <style>
+        /* --- IMPOSTAZIONI GENERALI --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Nasconde le barre di scorrimento */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* --- SFONDO --- */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('image.png'); /* Assicurati che l'immagine si chiami 'image.png' */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1; /* Mette lo sfondo dietro a tutto */
+        }
+
+        /* --- CONTENITORE PRINCIPALE --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* --- COUNTDOWN --- */
+        .countdown {
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5); /* Sfondo semi-trasparente per leggibilità */
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-shadow: 2px 2px 4px #000000;
+        }
+
+        .countdown h1 {
+            margin: 0;
+            font-size: 1.5em; /* Dimensione titolo */
+            font-weight: normal;
+        }
+
+        #timer {
+            font-size: 2.5em; /* Dimensione numeri */
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* --- GOOGLY EYES --- */
+        .eye {
+            position: absolute;
+            width: 50px; /* Larghezza dell'occhio bianco */
+            height: 50px; /* Altezza dell'occhio bianco */
+            background-color: white;
+            border-radius: 50%;
+            border: 2px solid black;
+            box-sizing: border-box;
+            /* Se gli occhi non sono posizionati correttamente, modifica i valori top e left qui sotto */
+        }
+
+        .pupil {
+            position: absolute;
+            width: 25px; /* Larghezza della pupilla */
+            height: 25px; /* Altezza della pupilla */
+            background-color: black;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Posizionamento Occhi - VOLTO IN ALTO (UOMO) */
+        #eye1 { top: 12%; left: 38%; width: 40px; height: 40px; }
+        #eye2 { top: 12%; left: 54%; width: 40px; height: 40px; }
+
+        /* Posizionamento Occhi - VOLTO IN BASSO (DONNA) */
+        #eye3 { top: 76%; left: 45%; }
+        #eye4 { top: 76%; left: 65%; }
+
+        /* Media Query per schermi più piccoli (es. smartphone in verticale) */
+        @media (max-width: 600px) {
+            #timer {
+                font-size: 1.8em;
+            }
+            .countdown h1 {
+                font-size: 1.2em;
+            }
+            .eye {
+                width: 40px; height: 40px;
+            }
+            .pupil {
+                width: 20px; height: 20px;
+            }
+
+            /* Riposizionamento per schermi stretti */
+            #eye1 { top: 12%; left: 33%; }
+            #eye2 { top: 12%; left: 58%; }
+
+            #eye3 { top: 76%; left: 38%; }
+            #eye4 { top: 76%; left: 63%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-container"></div>
+
+    <div class="main-container">
+
+        <div class="countdown">
+            <h1>Manca poco a un giorno speciale:</h1>
+            <div id="timer">Caricamento...</div>
+        </div>
+
+    </div>
+
+    <div class="eyes-container">
+        <div id="eye1" class="eye"><div class="pupil"></div></div>
+        <div id="eye2" class="eye"><div class="pupil"></div></div>
+
+        <div id="eye3" class="eye"><div class="pupil"></div></div>
+        <div id="eye4" class="eye"><div class="pupil"></div></div>
+    </div>
+
+    <script>
+        // --- LOGICA DEL COUNTDOWN ---
+        const countdownElement = document.getElementById('timer');
+        const targetDate = new Date("2026-06-27T00:00:00").getTime();
+
+        const updateCountdown = () => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                countdownElement.innerHTML = "EVENTO CONCLUSO!";
+                clearInterval(interval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.innerHTML = `${days}g ${hours}h ${minutes}m ${seconds}s`;
+        };
+
+        const interval = setInterval(updateCountdown, 1000);
+        updateCountdown(); // Chiamata immediata per non aspettare 1 secondo
+
+        // --- LOGICA DEGLI GOOGLY EYES ---
+        const pupils = document.querySelectorAll('.pupil');
+
+        function moveEyes(event) {
+            let x, y;
+            // Gestisce sia il mouse che il tocco sul display
+            if (event.touches) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+
+            pupils.forEach(pupil => {
+                const eye = pupil.parentElement;
+                const eyeRect = eye.getBoundingClientRect();
+                const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+                const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+                const angle = Math.atan2(y - eyeCenterY, x - eyeCenterX);
+                
+                // Limita il movimento della pupilla all'interno dell'occhio
+                const maxPupilMove = (eyeRect.width - pupil.offsetWidth) / 2;
+                
+                const pupilX = Math.cos(angle) * maxPupilMove;
+                const pupilY = Math.sin(angle) * maxPupilMove;
+                
+                // Applica lo spostamento relativo al centro dell'occhio
+                pupil.style.transform = `translate(-50%, -50%) translate(${pupilX}px, ${pupilY}px)`;
+            });
+        }
+
+        window.addEventListener('mousemove', moveEyes);
+        window.addEventListener('touchmove', moveEyes);
+
+    </script>
+</body>
+</html>
